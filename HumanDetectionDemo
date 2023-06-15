@@ -1,0 +1,142 @@
+import time
+import matplotlib.pyplot as plt
+import math
+from time import sleep
+
+import numpy as np
+
+x_raw = []
+y_raw = []
+z_raw = []
+
+
+x = []
+y = []
+z = []
+
+# filter
+for i in range(0, len(x_raw)):
+    if (x_raw[i] < 1) and (y_raw[i] < 0.5):
+        if (x_raw[i] > 1) and (y_raw[i] > 0.5):
+            print(x_raw[i] + y_raw[i] + z_raw[i])
+        x.append(x_raw[i])
+        y.append(y_raw[i])
+        z.append(z_raw[i])
+
+
+# init coordinates
+fig = plt.figure()
+
+# 3d
+lidar_polar = plt.subplot(projection = '3d')
+plt.xlabel('x')
+plt.ylabel('y')
+lidar_polar.set_zlabel('z')
+
+for i in range(0, len(z)):
+    z[i] = z[i] if z[i] > 0 else z[i] * -1
+
+for i in range(0, len(y)):
+    y[i] = y[i] if y[i] > 0 else y[i] * -1
+
+
+lidar_polar.scatter(x, y, z, marker=".")
+
+lidar_polar.text(0,0,0,"LiDAR")
+lidar_polar.text(0.15,0,0,"Radar")
+
+lidar_polar.view_init(elev=90, azim=-90, roll=0)
+
+plt.show()
+
+time.sleep(1)
+plt.close()
+
+
+
+def getClosestPointfromBoundary2d(x1, x2, y1, y2):
+    dist = []
+    # get all points between x1~x2, y1~y2
+    temp_x = []
+    temp_y = []
+    for i in range(0, len(x_2d)):
+        if (x_2d[i] > x1 and x_2d[i] < x2) and (y_2d[i] > y1 and y_2d[i] < y2):
+            temp_x.append(x_2d[i])
+            temp_y.append(y_2d[i])
+
+    # get distance from center point
+    for i in range(0, len(temp_x)):
+        dist.append(math.dist([(x2 + x1)/2, (y2 + y1)/2], [temp_x[i], temp_y[i]]))
+
+    idx = dist.index(max(dist))
+    return [temp_x[idx], temp_y[idx]]
+
+
+
+
+# Measure Dist/Angle
+lidar_polar = plt.subplot(projection = '3d')
+plt.xlabel('x')
+plt.ylabel('y')
+lidar_polar.set_zlabel('z')
+
+x_2d = []
+y_2d = []
+z_2d = []
+# get z axis 0 range
+for i in range(0, len(y)):
+    if z[i] == 0:
+        x_2d.append(x[i])
+        y_2d.append(y[i])
+        z_2d.append(0)
+
+plot1 = getClosestPointfromBoundary2d(-0.08, 0, 0.35, 0.45)
+plot2 = getClosestPointfromBoundary2d(0.1, 0.2, 0.3, 0.4)
+
+lidar_polar.plot(
+    [0.15, plot1[0]], 
+    [0, plot1[1]],
+    color = 'violet'
+)
+lidar_polar.plot(
+    [0.15, plot2[0]], 
+    [0, plot2[1]],
+    color = 'limegreen'
+)
+lidar_polar.scatter(x, y, z, marker=".")
+
+lidar_polar.text(0,0,0,"LiDAR")
+lidar_polar.text(0.15,0,0,"Radar")
+
+lidar_polar.view_init(elev=90, azim=-90, roll=0)
+
+plt.show()
+
+
+# Human or Non-Human
+lidar_polar = plt.subplot(projection = '3d')
+plt.xlabel('x')
+plt.ylabel('y')
+lidar_polar.set_zlabel('z')
+
+lidar_polar.plot(
+    [0.15, plot1[0]], 
+    [0, plot1[1]],
+    color = 'violet'
+)
+lidar_polar.plot(
+    [0.15, plot2[0]], 
+    [0, plot2[1]],
+    color = 'limegreen'
+)
+lidar_polar.scatter(x, y, z, marker=".")
+
+lidar_polar.text(0,0,0,"LiDAR")
+lidar_polar.text(0.15,0,0,"Radar")
+
+lidar_polar.text(plot1[0], plot1[1], 0, "Non-Human")
+lidar_polar.text(plot2[0], plot2[1], 0, "Human")
+
+lidar_polar.view_init(elev=90, azim=-90, roll=0)
+
+plt.show()
